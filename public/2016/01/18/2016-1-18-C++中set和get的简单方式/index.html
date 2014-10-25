@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>C++中set和get的简单方式 | Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下 ` #define SUCCESS 1 // #define SUCCESS 1 #define FAIL 0 // #define FAIL 0 #include &amp;lt;iostream&amp;gt; int add(int a, int b) { return a + b; } class A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中set和get的简单方式">
+<meta property="og:url" content="https://johzzy.github.io/2016/01/18/2016-1-18-C++中set和get的简单方式/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下 ` #define SUCCESS 1 // #define SUCCESS 1 #define FAIL 0 // #define FAIL 0 #include &amp;lt;iostream&amp;gt; int add(int a, int b) { return a + b; } class A">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-13T07:40:36.356Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++中set和get的简单方式">
+<meta name="twitter:description" content="在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下 ` #define SUCCESS 1 // #define SUCCESS 1 #define FAIL 0 // #define FAIL 0 #include &amp;lt;iostream&amp;gt; int add(int a, int b) { return a + b; } class A">
+  
+    <link rel="alternate" href="/atom.xml" title="Johzzy Pages" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2016-1-18-C++中set和get的简单方式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/01/18/2016-1-18-C++中set和get的简单方式/" class="article-date">
+  <time datetime="2016-01-18T02:46:05.000Z" itemprop="datePublished">2016-01-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Unclassified/">Unclassified</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++中set和get的简单方式
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下</p>
+<pre><code>`
+#define SUCCESS 1 // #define SUCCESS 1
+#define FAIL 0 // #define FAIL 0
+#include &lt;iostream&gt;
+int add(int a, int b) { return a + b; }
+class A
+{
+private:
+    int a_;
+    int b_;
+public:
+    const int&amp; a;
+    const int&amp; b;
+public:
+    int x_;
+    int y_;
+    const int&amp; x;
+    const int&amp; y;
+    A()
+    : a_(0), b_(0), x_(0), y_(0)
+    , a(a_), b(b_), x(x_), y(y_)
+    {}
+
+    void print() { 
+        std::cout &lt;&lt; &quot;  a=&quot; &lt;&lt; a &lt;&lt; &quot;, a_=&quot; &lt;&lt; a_ 
+              &lt;&lt; &quot;, b=&quot; &lt;&lt; b &lt;&lt; &quot;, b_=&quot; &lt;&lt; b_
+              &lt;&lt; &quot;, x=&quot; &lt;&lt; x &lt;&lt; &quot;, x_=&quot; &lt;&lt; x_
+              &lt;&lt; &quot;, y=&quot; &lt;&lt; y &lt;&lt; &quot;, y_=&quot; &lt;&lt; y_
+                          &lt;&lt; &quot;.\n&quot;;
+    }
+};
+
+int  main()
+{
+    int result = add(SUCCESS, FAIL);
+    A a;
+    a.x_ = 4;    // (1) 
+    //a.x = 5;    // (2) 
+    //a.a_ = 3; // (3)
+    //a.a = 5;  // (4)
+    a.y_ = a.x; // (5)
+    // a.y = a.x; // (6)
+    // a.a = a.y; // (7)    
+    a.print();
+    return 0;
+}
+`
+</code></pre><p>其中,</p>
+<p>(1) <code>public int x_</code>, 跟全局变量的访问一样<br>(2) <code>a.x</code> 为 <code>public int&amp;</code> 类型, 指向<code>public int x_</code>, 这里相当于 <code>set</code><br>(3) error, <code>private int a_</code> 尝试修改私有变量的值<br>(4) error, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(5) <code>a.x</code> 相当于<code>get</code>, 并修改 <code>y_</code><br>(6) <code>error</code>, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(7) <code>error</code>, <code>a.x</code> 相当于<code>get</code>, <code>a.a</code> 尝试修改<code>const</code>变量  </p>
+<p>对此，如果一个变量 <code>var</code> 是只读的，但是在对象构造时需要赋值, 可以参照如下方式</p>
+<pre><code>class A 
+{
+private:
+    int var_;
+public:
+    const int&amp; var;
+public:
+    A(int a):var_(a){}
+    Foo() { /*process var_*/ }
+};
+</code></pre><p>于是, 在初始化是可以 <code>A a(5)</code>, 在<code>a</code>的内部, 仍然可以对 <code>var_</code> 做任何处理, 使用时 <code>a.var</code>, 而不必考虑<code>var</code>被外界修改的问题.</p>
+<p>(完)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2016/01/18/2016-1-18-C++中set和get的简单方式/" data-id="cjh4njkcy001f1suf0v92e2ls" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/13/2016-4-13-my-string-format/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          一种字符串序列描述
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/11/20/2015-11-20-C++内存对齐/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">C++内存对齐</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Unclassified/">Unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/unclassified/">unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/无聊/">无聊</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/未分类/">未分类</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FTP/">FTP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lambda/">lambda</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/FTP/" style="font-size: 10px;">FTP</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/SecureCRT/" style="font-size: 10px;">SecureCRT</a> <a href="/tags/lambda/" style="font-size: 10px;">lambda</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/31/2016-08-31-fstab-shell-script/">一个简单的命令</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/29/2016-08-29-单引号’字符串‘/">单引号&#39;字符串&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_python/">CentOS 升级 Python 整理记录</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_gcc/">CentOS 升级 GCC 整理记录</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

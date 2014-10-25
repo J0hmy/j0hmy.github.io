@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>c版daemon进程例子 | Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="/*************************************************************************     &amp;gt;    File Name: deamon_test.c     &amp;gt;       Author: huangjinqiang     &amp;gt;        Email: ligelaige@gmail.com     &amp;gt;">
+<meta name="keywords" content="C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="c版daemon进程例子">
+<meta property="og:url" content="https://johzzy.github.io/2015/01/28/2015-1-28-daemon-use-c/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="/*************************************************************************     &amp;gt;    File Name: deamon_test.c     &amp;gt;       Author: huangjinqiang     &amp;gt;        Email: ligelaige@gmail.com     &amp;gt;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-13T09:15:48.547Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="c版daemon进程例子">
+<meta name="twitter:description" content="/*************************************************************************     &amp;gt;    File Name: deamon_test.c     &amp;gt;       Author: huangjinqiang     &amp;gt;        Email: ligelaige@gmail.com     &amp;gt;">
+  
+    <link rel="alternate" href="/atom.xml" title="Johzzy Pages" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2015-1-28-daemon-use-c" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/28/2015-1-28-daemon-use-c/" class="article-date">
+  <time datetime="2015-01-28T05:53:41.000Z" itemprop="datePublished">2015-01-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/unclassified/">unclassified</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      c版daemon进程例子
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>/*************************************************************************
+    &gt;    File Name: deamon_test.c
+    &gt;       Author: huangjinqiang
+    &gt;        Email: ligelaige@gmail.com
+    &gt; Created Time: Mon 28 Jan 2015 13:56:43 PM CST
+ ************************************************************************/
+
+#include &lt;time.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+
+char *getnow()
+{
+    char *wday[] = {&quot;Sun&quot;, &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;};
+    time_t timep;
+    struct tm *p;
+    time(&amp;timep);
+    p = gmtime(&amp;timep);
+    char *str = (char *)malloc(128);
+    sprintf(str, &quot;%4d-%02d-%02d %s %02d:%02d:%02d&quot;, 
+                    1900 + p-&gt;tm_year, 1 + p-&gt;tm_mon, p-&gt;tm_mday,
+                    wday[p-&gt;tm_wday], 8 + p-&gt;tm_hour, p-&gt;tm_min, p-&gt;tm_sec); 
+    return str;
+}
+
+int do_sth() 
+{ 
+    FILE * fhander = fopen(&quot;daemon_test.log&quot;, &quot;a&quot;);
+    char *str = getnow();
+    fprintf(fhander, &quot;Hello, Johnny! %d  NOW: %s\n&quot;, getpid(), str);
+    fclose(fhander);
+    return 0 ; 
+} 
+
+
+int main(void)
+{
+    pid_t pid = fork();
+    if(pid &lt; 0) 
+        return -1;
+    else if(pid &gt; 0)
+    {
+        printf (&quot;new  pid: %d\n&quot;, pid);            // new
+        printf (&quot;main pid: %d\n&quot;, getpid());    // main
+        exit(0);
+    }
+
+    while(1)
+    {
+        do_sth();                                // new
+        sleep(1);
+    }
+    return 0;
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/01/28/2015-1-28-daemon-use-c/" data-id="cjh4njkcj000s1suf27l0wvyf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/11/15/2015-11-15-miniseed-note/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Mini-Seed笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/01/22/2015-1-26-计算A文件相对B文件的路径/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">计算A文件相对B文件的路径</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Unclassified/">Unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/unclassified/">unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/无聊/">无聊</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/未分类/">未分类</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FTP/">FTP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lambda/">lambda</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/FTP/" style="font-size: 10px;">FTP</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/SecureCRT/" style="font-size: 10px;">SecureCRT</a> <a href="/tags/lambda/" style="font-size: 10px;">lambda</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/31/2016-08-31-fstab-shell-script/">一个简单的命令</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/29/2016-08-29-单引号’字符串‘/">单引号&#39;字符串&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_python/">CentOS 升级 Python 整理记录</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_gcc/">CentOS 升级 GCC 整理记录</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

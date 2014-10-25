@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>SecureCRT-RSA登陆服务器笔记 | Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="系统环境：CentOS登录用户：root0.创建RSA密钥对 SecureCRT → 工具 → 创建公钥 → 选择RSA加密算法 → 通行短语（例如：huangjinqiang.johnny） → 密钥长度 1024 → 选择 OpenSSH密钥格式 1.上传并修改公钥文件 SecureCRT →  选项 → 会话选项 → 类别 X/Y/Zmoderm → 上传,将上传的公钥重命名为~/.ssh/">
+<meta name="keywords" content="SecureCRT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SecureCRT-RSA登陆服务器笔记">
+<meta property="og:url" content="https://johzzy.github.io/2014/10/28/2014-10-28-SecureCRT-RSA登陆服务器笔记/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="系统环境：CentOS登录用户：root0.创建RSA密钥对 SecureCRT → 工具 → 创建公钥 → 选择RSA加密算法 → 通行短语（例如：huangjinqiang.johnny） → 密钥长度 1024 → 选择 OpenSSH密钥格式 1.上传并修改公钥文件 SecureCRT →  选项 → 会话选项 → 类别 X/Y/Zmoderm → 上传,将上传的公钥重命名为~/.ssh/">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-13T09:18:23.148Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SecureCRT-RSA登陆服务器笔记">
+<meta name="twitter:description" content="系统环境：CentOS登录用户：root0.创建RSA密钥对 SecureCRT → 工具 → 创建公钥 → 选择RSA加密算法 → 通行短语（例如：huangjinqiang.johnny） → 密钥长度 1024 → 选择 OpenSSH密钥格式 1.上传并修改公钥文件 SecureCRT →  选项 → 会话选项 → 类别 X/Y/Zmoderm → 上传,将上传的公钥重命名为~/.ssh/">
+  
+    <link rel="alternate" href="/atom.xml" title="Johzzy Pages" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2014-10-28-SecureCRT-RSA登陆服务器笔记" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/28/2014-10-28-SecureCRT-RSA登陆服务器笔记/" class="article-date">
+  <time datetime="2014-10-27T19:23:41.000Z" itemprop="datePublished">2014-10-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/未分类/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      SecureCRT-RSA登陆服务器笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="系统环境：CentOS"><a href="#系统环境：CentOS" class="headerlink" title="系统环境：CentOS"></a>系统环境：CentOS</h2><h2 id="登录用户：root"><a href="#登录用户：root" class="headerlink" title="登录用户：root"></a>登录用户：root</h2><p>0.创建RSA密钥对</p>
+<p>SecureCRT → 工具 → 创建公钥 → 选择RSA加密算法 → 通行短语（例如：huangjinqiang.johnny） → 密钥长度 1024 → 选择 OpenSSH密钥格式</p>
+<p>1.上传并修改公钥文件</p>
+<p>SecureCRT →  选项 → 会话选项 → 类别 X/Y/Zmoderm → 上传,将上传的公钥重命名为<br>~/.ssh/authorized_keys</p>
+<pre><code># chmod 700 ~/.ssh
+# chmod 644 ~/.ssh/authorized_keys
+</code></pre><p>2.修改/etc/ssh/sshd_config</p>
+<p>在Linux服务器上编辑 sshd.config 文件</p>
+<pre><code># vi /usr/local/etc/sshd_config    
+PasswordAuthentication no  # （关闭口令认证）        
+PubkeyAuthentication yes   # （开启公钥认证） // 默认好像是开启的        
+AuthorizedKeysFile .ssh/authorized_keys  # （认证公钥文件位置）
+</code></pre><p>3.重启sshd服务</p>
+<pre><code># /etc/init.d/sshd restart
+</code></pre><p>4.登录设置</p>
+<p>SecureCRT → 文件 → 快速连接 → 选择协议(SSH2)、主机名、端口、用户名，将鉴权中的公钥选为首选登录方式，连接</p>
+<p>5.密钥登录</p>
+<p>首次登陆需要选择客户端的公钥所在位置(*)，然后点击登陆即可。<br>如果设置有误导致登陆失败，SecureCRT将执行鉴权后面的登录方式（如密码登陆）尝试登陆服务器。</p>
+<p>*关键点：</p>
+<p>windows客户端的公钥和私钥需要放在同一目录下，打开时选择公钥后，SecureCRT会对比客户端与服务器的公钥是否一致，如果一致则继续读取客户端的私钥，使用加密算法验证私钥与公钥是否匹配（关键点属作者个人理解，如有错误，欢迎讨论：hellojinqiang [at] gmail.com）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/10/28/2014-10-28-SecureCRT-RSA登陆服务器笔记/" data-id="cjh4njkbo00001sufohi5gd5d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/11/10/2014-11-10-DES加密/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          DES加密
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/02/21/2014-2-21-Ubuntu下搭建FTP服务器/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Ubuntu下搭建FTP服务器</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Unclassified/">Unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/unclassified/">unclassified</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/无聊/">无聊</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/未分类/">未分类</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FTP/">FTP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SecureCRT/">SecureCRT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lambda/">lambda</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/FTP/" style="font-size: 10px;">FTP</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/SecureCRT/" style="font-size: 10px;">SecureCRT</a> <a href="/tags/lambda/" style="font-size: 10px;">lambda</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/31/2016-08-31-fstab-shell-script/">一个简单的命令</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/29/2016-08-29-单引号’字符串‘/">单引号&#39;字符串&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_python/">CentOS 升级 Python 整理记录</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/28/2016-07-28-centos_upgrade_gcc/">CentOS 升级 GCC 整理记录</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
