@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>批量获取歌曲链接 | Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="可能是被各种网盘惯坏了，不想一个一个去下载，索性把这些歌曲的网盘链接保存下来，就写了一个批量获取歌曲链接的脚本，在此记录一下。 基本思路很简单：wget下载网页，grep、awk分析网页，保存结果。 代码贴一下： #!&#x2F;bin&#x2F;bash #    File Name: getapeurl.sh #       Author: johzzy #        Email: hellojinqiang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="批量获取歌曲链接">
+<meta property="og:url" content="https://johzzy.github.io/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="可能是被各种网盘惯坏了，不想一个一个去下载，索性把这些歌曲的网盘链接保存下来，就写了一个批量获取歌曲链接的脚本，在此记录一下。 基本思路很简单：wget下载网页，grep、awk分析网页，保存结果。 代码贴一下： #!&#x2F;bin&#x2F;bash #    File Name: getapeurl.sh #       Author: johzzy #        Email: hellojinqiang">
+<meta property="og:locale">
+<meta property="article:published_time" content="2014-11-16T07:40:59.000Z">
+<meta property="article:modified_time" content="2021-06-18T11:16:37.642Z">
+<meta property="article:author" content="johzzy">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/public/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/public/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/public/">Home</a>
+        
+          <a class="main-nav-link" href="/public/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2014-11-16-批量获取歌曲链接" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" class="article-date">
+  <time datetime="2014-11-16T07:40:59.000Z" itemprop="datePublished">2014-11-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      批量获取歌曲链接
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>可能是被各种网盘惯坏了，不想一个一个去下载，索性把这些歌曲的网盘链接保存下来，就写了一个批量获取歌曲链接的脚本，在此记录一下。</p>
+<p>基本思路很简单：wget下载网页，grep、awk分析网页，保存结果。</p>
+<p>代码贴一下：</p>
+<pre><code>#!/bin/bash
+#    File Name: getapeurl.sh
+#       Author: johzzy
+#        Email: hellojinqiang@gmail.com
+# Created Time: Sun 16 Nov 2014 03:01:34 PM CST
+
+
+#while read line
+#do
+#    echo $line
+#done &lt; readme.txt
+
+part=&quot;songs_part&quot;
+bak=&quot;songs_bak_part&quot;
+file=&quot;songs.txt&quot;
+musicurl=&quot;musicurl.txt&quot;
+
+declare -i num=0
+
+for url in `cat $musicurl` ; 
+do
+    let num++
+    afile=&quot;$part$num&quot;
+    bfile=&quot;$bak$num&quot;
+    echo $url
+    wget $url -O $afile -o $file 2&gt;&amp;1 /dev/null
+
+    grep href $afile &gt; $bfile
+    grep &quot;http://115.com&quot; $bfile &gt; $afile
+    awk -F &quot;&gt;&quot; &apos;&#123; printf $2 &quot;\n&quot; &#125;&apos; $afile &gt; $bfile
+    awk -F &quot;&lt;&quot; &apos;&#123; printf $1 &quot;\n&quot; &#125;&apos; $bfile &gt; $afile
+done
+
+echo -n &gt; $file
+
+for i in `seq $num` ;
+do 
+    cat &quot;$part$i&quot; &gt;&gt; $file
+    rm &quot;$part$i&quot; &quot;$bak$i&quot;
+done
+[ $? = 0 ] &amp;&amp; echo &quot;ok, all songs url in the file $file.&quot;
+</code></pre><p>其中文件musicurl.txt保存了相关网页</p>
+<pre><code>http://www.cdbao.net/thread-20150-1-1.html
+http://www.cdbao.net/thread-20157-1-1.html
+http://www.cdbao.net/thread-20170-1-1.html
+</code></pre><p>公开一下代码链接吧</p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/getapeurl.sh">getapeurl.sh</a></p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/musicurl.txt">musicurl.txt</a></p>
+<p>生成的链接文件</p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/songs.txt">songs.txt</a></p>
+<p>欢迎下载，如果可以请分享一下你下载的歌曲给我，谢谢！</p>
+<p>(完)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" data-id="ckq28t72c000197vq557zckbj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/shell/" rel="tag">shell</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/public/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          文本处理-小笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/public/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">计算两个文件的相对路径</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a><span class="category-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/Python/" rel="tag">Python</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/ffmpeg/" rel="tag">ffmpeg</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/lambda/" rel="tag">lambda</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/shell/" rel="tag">shell</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/webrtc/" rel="tag">webrtc</a><span class="tag-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/public/2021/06/18/simulcast-support-in-srs/">simulcast support in srs</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/16/simulcast/">Simulcast</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/01/field-trails/">Field Trails</a>
+          </li>
+        
+          <li>
+            <a href="/public/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/">单引号 字符串</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/public/" class="mobile-nav-link">Home</a>
+  
+    <a href="/public/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/public/fancybox/jquery.fancybox.css">
+
+  
+<script src="/public/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/public/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

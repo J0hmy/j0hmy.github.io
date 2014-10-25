@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Ubuntu下搭建FTP服务器 | Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="由于连接开发板，传输文件的需要，我在ubuntu上安装了ftp服务器FTP软件选择vsftpd（very secure FTP daemon）uwin@ubuntu:~$ sudo apt-get install vsftpd命令执行过程中，安装程序会给本地创建一个名为“ftp”的用户组，命令执行完之后会自动启动FTP服务。在浏览器里输入”ftp:&#x2F;&#x2F;localhost&quot; 检查FTP端口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu下搭建FTP服务器">
+<meta property="og:url" content="https://johzzy.github.io/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="由于连接开发板，传输文件的需要，我在ubuntu上安装了ftp服务器FTP软件选择vsftpd（very secure FTP daemon）uwin@ubuntu:~$ sudo apt-get install vsftpd命令执行过程中，安装程序会给本地创建一个名为“ftp”的用户组，命令执行完之后会自动启动FTP服务。在浏览器里输入”ftp:&#x2F;&#x2F;localhost&quot; 检查FTP端口">
+<meta property="og:locale">
+<meta property="article:published_time" content="2014-02-21T08:24:44.000Z">
+<meta property="article:modified_time" content="2021-06-16T08:32:53.702Z">
+<meta property="article:author" content="johzzy">
+<meta property="article:tag" content="FTP">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/public/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/public/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/public/">Home</a>
+        
+          <a class="main-nav-link" href="/public/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2014-2-21-Ubuntu下搭建FTP服务器" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="article-date">
+  <time datetime="2014-02-21T08:24:44.000Z" itemprop="datePublished">2014-02-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Ubuntu下搭建FTP服务器
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <div>由于连接开发板，传输文件的需要，我在ubuntu上安装了ftp服务器</div><br><div>FTP软件选择vsftpd（very secure FTP daemon）<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo apt-get install vsftpd</pre><br><code></code></div><br><div>命令执行过程中，安装程序会给本地创建一个名为“ftp”的用户组，命令执行完之后会自动启动FTP服务。</div><br><div></div><br><div>在浏览器里输入”<a href="ftp://localhost&quot;">ftp://localhost&quot;</a> 检查FTP端口有没有打开</div><br><div></div><br><div>创建一个专门用来访问的用户：ligelaige</div><br><pre class="brush: bash; gutter: true">mkdir -p /home/test<br>useradd test -g ftp -d /home/test -s /sbin/nologin</pre><br>设置密码:<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# mkdir /home/ligelaige<br>root@ubuntu:/home/uwin# useradd ligelaige -g ftp -d /home/ligelaige/ -s /sbin/nologin<br>root@ubuntu:/home/uwin# passwd ligelaige<br>输入新的 UNIX 密码：<br>重新输入新的 UNIX 密码：<br>passwd：已成功更新密码<br>root@ubuntu:/home/uwin#</pre><br><div> 修改vsftpd的配置文件</div><br><div><br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# gedit /etc/vsftpd.conf</pre><br></div><br><div><br><br>需要修改到字段有<br><pre class="brush: bash; gutter: true">#禁止匿名访问<br>anonymous_enable=NO<br>#接受本地用户<br>local_enable=YES<br>#可以上传<br>write_enable=YES<br>#启用在chroot_list_file的用户只能访问根目录<br>chroot_list_enable=YES<br>chroot_list_file=/etc/vsftpd.chroot_list</pre><br>建议修改的方法是<br><br></div><br><div>alt + F 搜索 anonymous_enable=NO（举例）进行修改</div><br><div></div><br><div><br><br>在/etc/vsftpd.chroot_list添加受访问目录限制的用户：<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# echo &quot;ligelaige&quot; &gt;&gt; /etc/vsftpd.chroot_list<br>root@ubuntu:/home/uwin# chmod a-w /home/ligelaige/</pre><br>重启vsftpd之后就可以使用ligelaige账号访问了<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo service vsftpd restart</pre><br></div>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" data-id="ckpz90v5c000b7jvqaqdp2bq1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/public/2014/10/28/2014-10-28-SecureCRT-RSA%E7%99%BB%E9%99%86%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%94%E8%AE%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          SecureCRT-RSA登陆服务器笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/public/2013/04/17/2013-4-17-about/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">About</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/public/categories/未分类/">未分类</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/public/categories/未分类/">未分类</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/public/categories/%E6%97%A0%E8%81%8A/">未分类</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a><span class="category-list-count">10</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/C/" rel="tag">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/DES/" rel="tag">DES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/Python/" rel="tag">Python</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/SecureCRT/" rel="tag">SecureCRT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/ffmpeg/" rel="tag">ffmpeg</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/lambda/" rel="tag">lambda</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/shell/" rel="tag">shell</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/public/tags/C/" style="font-size: 10px;">C</a> <a href="/public/tags/C/" style="font-size: 10px;">C++</a> <a href="/public/tags/DES/" style="font-size: 10px;">DES</a> <a href="/public/tags/FTP/" style="font-size: 10px;">FTP</a> <a href="/public/tags/Python/" style="font-size: 20px;">Python</a> <a href="/public/tags/SecureCRT/" style="font-size: 10px;">SecureCRT</a> <a href="/public/tags/ffmpeg/" style="font-size: 10px;">ffmpeg</a> <a href="/public/tags/lambda/" style="font-size: 10px;">lambda</a> <a href="/public/tags/shell/" style="font-size: 15px;">shell</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/10/">October 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/public/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/08/31/2016-08-31-fstab-shell-script/">一个简单的命令</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7%E2%80%99%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%98/">单引号&#39;字符串&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/07/28/2016-07-28-centos_upgrade_python/">CentOS 升级 Python 整理记录</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/07/28/2016-07-28-centos_upgrade_gcc/">CentOS 升级 GCC 整理记录</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/public/" class="mobile-nav-link">Home</a>
+  
+    <a href="/public/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/public/fancybox/jquery.fancybox.css">
+
+  
+<script src="/public/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/public/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

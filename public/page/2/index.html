@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Johzzy Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="some code, some note.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Johzzy Pages">
+<meta property="og:url" content="https://johzzy.github.io/page/2/index.html">
+<meta property="og:site_name" content="Johzzy Pages">
+<meta property="og:description" content="some code, some note.">
+<meta property="og:locale">
+<meta property="article:author" content="johzzy">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/public/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/public/" id="logo">Johzzy Pages</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/public/">Home</a>
+        
+          <a class="main-nav-link" href="/public/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johzzy.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-2015-11-20-C++内存对齐" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" class="article-date">
+  <time datetime="2015-11-20T02:06:05.000Z" itemprop="datePublished">2015-11-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">C++内存对齐</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><pre><code>`
+#pragma pack(push)
+#pragma pack(n)
+#pragma pack(show)
+struct A
+&#123;
+    char     c;     //1byte
+    double   d;     //8byte
+    short    s;     //2byte
+    int      i;     //4byte
+&#125;;
+#pragma pack(pop)
+#pragma pack(show)
+int main(int argc, char* argv[])
+&#123;
+    A a;
+    printf(&quot;A length: %d\n&quot;,sizeof(A));
+    printf(&quot;a.c:%10d\na.d:%10d\na.s:%10d\na.i:%10d\n&quot;,&amp;a.c, &amp;a.d, &amp;a.s, &amp;a.i);
+    return 0;
+&#125;
+`
+</code></pre><h1 id="n-1"><a href="#n-1" class="headerlink" title="n = 1"></a>n = 1</h1><p>内存对齐的结果为1，相当于不进行内存对齐，一些协议的设计可能会迫使我们修改n为1，<br>结果如下：</p>
+<pre><code>A length: 15
+a.c:  11795164
+a.d:  11795165
+a.s:  11795173
+a.i:  11795175
+</code></pre><p>其中，这里的4913360不一定是2、4或者8的倍数。</p>
+<h1 id="n-2"><a href="#n-2" class="headerlink" title="n = 2"></a>n = 2</h1><p>结果如下：</p>
+<pre><code>A length: 16
+a.c:  12516948
+a.d:  12516950
+a.s:  12516958
+a.i:  12516960
+</code></pre><h1 id="n-3"><a href="#n-3" class="headerlink" title="n = 3"></a>n = 3</h1><p>编译器警告：warning C4086: 杂注参数应为“1”、“2”、“4”、“8”或者“16”<br>结果是：</p>
+<pre><code>A length: 24
+a.c:   9959560
+a.d:   9959568
+a.s:   9959576
+a.i:   9959580
+</code></pre><p>所以，最好取n为2的幂（此时，编译器以默认值#pragma pack(8)对齐）</p>
+<h1 id="n-4"><a href="#n-4" class="headerlink" title="n = 4"></a>n = 4</h1><p>结果如下：</p>
+<pre><code>A length: 20
+a.c:  12516320
+a.d:  12516324
+a.s:  12516332
+a.i:  12516336
+</code></pre><h1 id="n-8"><a href="#n-8" class="headerlink" title="n = 8"></a>n = 8</h1><p>结果如下：</p>
+<pre><code>A length: 24
+a.c:  17300184
+a.d:  17300192
+a.s:  17300200
+a.i:  17300204
+</code></pre><h1 id="当注释内存对齐指令时"><a href="#当注释内存对齐指令时" class="headerlink" title="当注释内存对齐指令时"></a>当注释内存对齐指令时</h1><p>//#pragma   pack(n)</p>
+<p>结果</p>
+<pre><code>A length: 24
+a.c:   8453680
+a.d:   8453688
+a.s:   8453696
+a.i:   8453700
+</code></pre><p>所以 如果不指定内存对齐，或者内存对齐不是2的幂次时，<br>编译器给出默认值<br><code>#pragma   pack(8)</code><br>另外，当n取值不合适时，可能需要2次寻址</p>
+<p>注：</p>
+<p>Windows 8.1 Pro x64 bit</p>
+<p>用于 80x86 的 Microsoft (R) 32 位 C/C++ 优化编译器 16.00.30319.01 版</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" data-id="ckq28t72p000l97vq0tbr332e" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-11-15-miniseed-note" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/11/15/2015-11-15-miniseed-note/" class="article-date">
+  <time datetime="2015-11-15T07:06:05.000Z" itemprop="datePublished">2015-11-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/11/15/2015-11-15-miniseed-note/">Mini-Seed笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>下载libmseed代码库</p>
+<pre><code>https://seiscode.iris.washington.edu/projects/libmseed/files
+</code></pre><p>将 miniseed 数据流转化为 MSRecord 结构</p>
+<pre><code>// 引入头文件
+#include &quot;libmseed.h&quot;
+// 初始化一个 MSRecord
+MSRecord *msr = msr_init(NULL);
+/* 标注1 */
+// 尝试Unpack，如果 retcode == MS_NOERROR，则成功，相应信息保存在 msr 中
+int retcode = msr_unpack((char *)mseed_buffer, mseed_buffer_length, &amp;msr, true, 1);
+// 从 msr 获取信息
+char* network = msr-&gt;network;
+char* station = msr-&gt;station;
+char* channel = msr-&gt;channel;
+char* location = msr-&gt;location;
+char* starttime = msr-&gt;starttime;
+char* samprate = msr-&gt;samprate;
+
+unsigned int numsamples =  msr-&gt;numsamples;
+char sampletype = msr-&gt;sampletype;
+
+void * datasamples = msr-&gt;datasamples;
+
+// 释放MSRecord
+msr_free(&amp;msr);
+</code></pre><p>标注</p>
+<pre><code>如果mseed使用的是国家标准
+在 `标注1` 处可能需要修正 mseed 数据流，原因是在libmseed.h中有一个宏定义检查
+
+    #define MS_ISVALIDHEADER(X) (                               \
+      (isdigit ((int) *(X))   || *(X)   == &apos; &apos; || !*(X) )   &amp;&amp;  \
+      (isdigit ((int) *(X+1)) || *(X+1) == &apos; &apos; || !*(X+1) ) &amp;&amp;  \
+      (isdigit ((int) *(X+2)) || *(X+2) == &apos; &apos; || !*(X+2) ) &amp;&amp;  \
+      (isdigit ((int) *(X+3)) || *(X+3) == &apos; &apos; || !*(X+3) ) &amp;&amp;  \
+      (isdigit ((int) *(X+4)) || *(X+4) == &apos; &apos; || !*(X+4) ) &amp;&amp;  \
+      (isdigit ((int) *(X+5)) || *(X+5) == &apos; &apos; || !*(X+5) ) &amp;&amp;  \
+      MS_ISDATAINDICATOR(*(X+6)) &amp;&amp;                             \
+      (*(X+7) == &apos; &apos; || *(X+7) == &apos;\0&apos;) &amp;&amp;                      \
+      (int)(*(X+24)) &gt;= 0 &amp;&amp; (int)(*(X+24)) &lt;= 23 &amp;&amp;            \
+      (int)(*(X+25)) &gt;= 0 &amp;&amp; (int)(*(X+25)) &lt;= 59 &amp;&amp;            \
+      (int)(*(X+26)) &gt;= 0 &amp;&amp; (int)(*(X+26)) &lt;= 60 )
+
+修正的方式可以将mseed_buffer的前6个字节置为 0(ascii 0, 不是 &apos;0&apos;)，之前注意保存副本。
+
+此外，可能会遇到大小端的问题
+</code></pre><p>大小端转换</p>
+<pre><code>#define BigtoLittle16(A) ((((u16)(A) &amp; 0xff00) &gt;&gt; 8) | (((u16)(A) &amp; 0x00ff) &lt;&lt; 8))
+#define BigtoLittle32(A) ((((u32)(A) &amp; 0xff000000) &gt;&gt; 24) | (((u32)(A) &amp; 0x00ff0000) &gt;&gt; 8) | (((u32)(A) &amp; 0x0000ff00) &lt;&lt; 8)  | (((u32)(A) &amp; 0x000000ff) &lt;&lt; 24))
+</code></pre><p>另外，可能需要在设计数据结构时，注意内存对齐，解决的方法是 修改数据结构，或者 添加编译器指令 </p>
+<pre><code>#pragma   pack(n)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/11/15/2015-11-15-miniseed-note/" data-id="ckq28t72n000i97vq3je4h7oy" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-1-26-计算A文件相对B文件的路径" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/01/22/2015-1-26-%E8%AE%A1%E7%AE%97A%E6%96%87%E4%BB%B6%E7%9B%B8%E5%AF%B9B%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84/" class="article-date">
+  <time datetime="2015-01-22T07:53:41.000Z" itemprop="datePublished">2015-01-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/01/22/2015-1-26-%E8%AE%A1%E7%AE%97A%E6%96%87%E4%BB%B6%E7%9B%B8%E5%AF%B9B%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84/">计算A文件相对B文件的路径</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>以前写的代码，今天发一下</p>
+<pre><code>/*************************************************************************
+    &gt;    File Name: relative_path.cpp
+    &gt;       Author: johzzy
+    &gt;        Email: hellojinqiang@gmail.com
+    &gt; Created Time: Thu 13 Nov 2014 01:59:18 AM CST
+    &gt;      Compile: g++ relative_path.cpp -std=c++14
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+
+using namespace std;
+
+auto split(const string &amp;s, const char delim = &apos; &apos;)
+&#123;
+    stringstream ss(s);
+    string item;
+    vector&lt;string&gt; elems;
+
+    while(getline(ss, item, delim) != NULL)
+    &#123;
+        elems.push_back(item);
+    &#125;
+    return  elems;
+&#125;
+
+int main(void)
+&#123;
+    string a, b;
+    cout &lt;&lt; &quot;Please Enter the Absolute Path of the File!&quot; &lt;&lt; endl; 
+    cout &lt;&lt; &quot;a = &quot;;
+    cin &gt;&gt; a;
+    cout &lt;&lt; &quot;b = &quot;;
+    cin &gt;&gt; b;
+
+    auto diffpath = [](const string &amp;a, const string &amp;b) &#123;
+        int k = 0;
+        for (int i=0; i&lt; a.length() &amp;&amp; i&lt;b.length() &amp;&amp; a[i] == b[i]; ++i)
+            if (a[i] == &apos;/&apos;) k=i;
+        return k+1;
+    &#125;;
+
+    int index = diffpath(a, b);
+
+    a = a.substr(index);
+    b = b.substr(index);
+
+    auto vecta = split(a, &apos;/&apos;);
+    auto vectb = split(b, &apos;/&apos;);
+
+    string a_path_b = &quot;&quot;; //a relative to b path
+    string b_path_a = &quot;&quot;; //b relative to a path
+
+    for (int i=1; i&lt;vecta.size(); ++i)
+        a_path_b += &quot;../&quot;;
+    a_path_b += a;
+
+    for(int i=1; i&lt;vectb.size(); ++i)
+        b_path_a += &quot;../&quot;;
+    b_path_a += b;
+
+    cout &lt;&lt; &quot;a relative to b path: &quot; &lt;&lt; a_path_b &lt;&lt; endl;
+    cout &lt;&lt; &quot;b relative to a path: &quot; &lt;&lt; b_path_a &lt;&lt; endl;
+
+    return 0;
+&#125;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/01/22/2015-1-26-%E8%AE%A1%E7%AE%97A%E6%96%87%E4%BB%B6%E7%9B%B8%E5%AF%B9B%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84/" data-id="ckq28t72m000f97vq7z471bg8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/C/" rel="tag">C++</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-1-20-python-tree" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/01/20/2015-1-20-python-tree/" class="article-date">
+  <time datetime="2015-01-19T23:23:41.000Z" itemprop="datePublished">2015-01-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/01/20/2015-1-20-python-tree/">Python Tree</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>#!/usr/bin/env python
+#    -*-coding: utf-8-*-     
+#    File Name: tree
+#       Author: johzzy
+#        Email: hellojinqiang@gmail.com
+# Created Time: Tue 20 Jan 2015 10:17:03 PM CST
+
+import sys
+import os
+
+DEBUG = False
+CLEAN = False
+ALL = False
+
+def lsall(dir, space = &quot;&quot;):
+    dirname = dir
+    global CLEAN
+    if CLEAN and not os.listdir(dirname):
+        os.rmdir(dirname)
+        return
+
+    dirs = filter(lambda x: ALL or x[0] != &apos;.&apos;, os.listdir(dirname))
+    for item in dirs:
+        if os.path.isdir(os.path.join(dirname, item)):
+            subspace = space + &quot;|  &quot;
+            print &quot;%s%s&quot; % (subspace, item)
+            lsall(os.path.join(dirname, item), subspace)
+        else:
+            subspace = space + &quot;|--&quot;
+            print &quot;%s%s&quot; % (subspace, item)
+
+
+def main(args):
+    for arg in filter(lambda x: os.path.exists(x), args):
+        print arg
+        lsall(arg, &quot;&quot;)
+
+def help():
+    print &apos;&apos;&apos;
+Usage:
+1) tree 
+    default dir is your home directory
+2) tree demodir
+    print all files in demodir
+3) tree demo1 demo2 demo3 ...
+    print all files in these directories
+4) tree --help or tree -h
+    print tree Usage
+5) tree --clean or tree -c
+    print all file(s) in directory(s) and delete empty directory
+
+version: 0.03
+ author: Johnny Wong
+   date: 2015-01-20
+    &apos;&apos;&apos;
+
+if __name__ == &quot;__main__&quot;:
+    if len(sys.argv) &gt; 1:
+        args = sys.argv[1:]
+    else:
+        args = [os.getcwd()]
+
+    if &apos;--help&apos; in args or &apos;-h&apos; in args:
+        help()
+        exit(0)
+
+    if &apos;--clean&apos; in args:
+        CLEAN = True
+        args.remove(&apos;--clean&apos;)
+    if &apos;-c&apos; in args:
+        CLEAN = True
+        args.remove(&apos;-c&apos;)
+
+    if &apos;--all&apos; in args:
+        ALL = True
+        args.remove(&apos;--all&apos;)
+    if &apos;-a&apos; in args:
+        ALL = True
+        args.remove(&apos;-a&apos;)
+
+    if DEBUG:
+        args = [&apos;/home/johzzy/courses&apos;]
+
+    main(args)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/01/20/2015-1-20-python-tree/" data-id="ckq28t72k000b97vq3bi3ali7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-1-14-python-发送邮件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/01/14/2015-1-14-python-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6/" class="article-date">
+  <time datetime="2015-01-14T06:23:41.000Z" itemprop="datePublished">2015-01-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/01/14/2015-1-14-python-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6/">Python 发送邮件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>#!/bin/python
+#    -*-coding: utf-8-*-     
+#    File Name: send_mail.py
+#       Author: johzzy
+#        Email: hellojinqiang@gmail.com
+# Created Time: Wed 07 Jan 2015 02:36:04 PM CST
+
+import smtplib  
+from email.mime.text import MIMEText  
+
+mailto_list     = [&apos;Inboxs@inboxmail&apos;]         #收件箱
+user             = &quot;OutboxName&quot;              #邮件署名 可省略为&quot;&quot;
+mail_user         = &quot;Outbox&quot;                    #发件箱的用户名
+mail_postfix     = &quot;outboxmail&quot;              #发件箱的后缀
+mail_pass         = &quot;OutboxLoginPassword&quot;       #发件箱的登陆密码 
+mail_host         = &quot;smtp.outboxmail&quot;          #发件箱的服务器
+
+def send_mail(to_list,sub,content):  
+    me = user+&quot;&lt;&quot;+mail_user+&quot;@&quot;+mail_postfix+&quot;&gt;&quot;                   #    OutboxName&lt;Outbox@outboxmail&gt;
+    msg = MIMEText(content,_subtype=&apos;plain&apos;,_charset=&apos;utf8&apos;)  
+    msg[&apos;Subject&apos;] = sub  
+    msg[&apos;From&apos;] = me  
+    msg[&apos;To&apos;] = &quot;;&quot;.join(to_list)  
+    try:  
+        server = smtplib.SMTP()  
+        server.connect(mail_host)  
+        server.login(mail_user,mail_pass)  
+        server.sendmail(me, to_list, msg.as_string())  
+        server.close()  
+        return True  
+    except Exception, e:  
+        print str(e)  
+        return False  
+
+if __name__ == &apos;__main__&apos;:  
+    if send_mail(mailto_list,&quot;hello&quot;,&quot;hello world！&quot;):  
+        print &quot;发送成功&quot;  
+    else:  
+        print &quot;发送失败&quot;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6/" data-id="ckq28t72k000a97vq1x6he3ln" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-1-14-python-ssh传输文件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2015/01/14/2015-1-14-python-ssh%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6/" class="article-date">
+  <time datetime="2015-01-13T23:23:41.000Z" itemprop="datePublished">2015-01-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2015/01/14/2015-1-14-python-ssh%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6/">Python SSH 传输文件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>#!/usr/bin/env python
+#    -*-coding: utf-8-*-     
+#    File Name: ssh_test.py
+#       Author: johzzy
+#        Email: hellojinqiang@gmail.com
+# Created Time: Tue 13 Jan 2015 07:18:41 PM CST
+
+import pexpect  
+
+import subprocess
+
+class rsync_tool:
+    def __init__(self):
+        self.user = &apos;johnny&apos;
+        self.host = &apos;172.16.123.128&apos;
+        self.remote_file = &apos;/tmp/joke&apos;
+        self.local_file = &apos;/tmp/me&apos;
+        self.passwd_file = &apos;/tmp/johnny.pwd&apos;
+
+        self.fhandler = open(self.passwd_file, &apos;r&apos;)
+        self.passwd = self.fhandler.read()
+        self.fhandler.close()
+
+    def download(self, remote_file, local_file):
+        getfile = &apos;rsync %s@%s:%s %s&apos; % (self.user, self.host, remote_file, local_file)
+
+        child = pexpect.spawn(getfile)
+        child.expect(&quot;password: &quot;)
+        child.sendline(self.passwd)
+        child.read()
+
+    def upload(self, local_file, remote_file):
+        sendfile = &apos;rsync %s %s@%s:%s&apos; % (local_file, self.user, self.host, remote_file)
+
+        child = pexpect.spawn(sendfile)
+        child.expect(&quot;password: &quot;)
+        child.sendline(self.passwd)
+        child.read()
+
+    def test(self):
+        subprocess.call(&quot;rsync  --password-file=&apos;/tmp/johnny.pwd&apos; johnny@172.16.123.128:/tmp/joke /tmp/joke&quot;)
+
+    def main(self):
+        self.upload(&quot;/tmp/hello.txt&quot;, &quot;/tmp/world.txt&quot;)
+        self.download(&quot;/tmp/world.txt&quot;, &quot;/tmp/hello&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    r = rsync_tool()
+    r.main()
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-ssh%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6/" data-id="ckq28t72i000697vq5xlo8u3i" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-11-17-文本处理-小笔记" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/" class="article-date">
+  <time datetime="2014-11-17T03:20:59.000Z" itemprop="datePublished">2014-11-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/">文本处理-小笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>工作中遇到的，蛮简单，将下列ip</p>
+<pre><code>10.158.139.11,10.158.139.13,10.158.139.16,10.158.139.19,10.158.139.20,10.158.139.22,10.158.139.24,10.158.139.27,10.158.139.28,10.158.139.29,10.158.139.36,10.158.139.37,10.158.139.39,10.158.139.42,10.158.139.43,10.158.139.44,10.158.139.45,10.158.139.46,10.158.139.47,10.158.139.48,10.158.139.50,10.158.139.51,10.158.139.58,10.158.139.59,10.158.150.13
+</code></pre><p>处理成这样</p>
+<pre><code>10.158.139.11
+10.158.139.13
+10.158.139.16
+10.158.139.19
+10.158.139.20
+10.158.139.22
+10.158.139.24
+10.158.139.27
+10.158.139.28
+10.158.139.29
+10.158.139.36
+10.158.139.37
+10.158.139.39
+10.158.139.42
+10.158.139.43
+10.158.139.44
+10.158.139.45
+10.158.139.46
+10.158.139.47
+10.158.139.48
+10.158.139.50
+10.158.139.51
+10.158.139.58
+10.158.139.59
+10.158.150.13    
+</code></pre><p>操作很简单</p>
+<pre><code>sed &apos;s/,/\n/g&apos; ip.txt &gt; ip_result
+</code></pre><p>相关代码:</p>
+<p><a href="http://johzzy.github.io/resources/ip_handle/ip.sh">ip.sh</a></p>
+<p><a href="http://johzzy.github.io/resources/ip_handle/ip.txt">ip.txt</a></p>
+<p><a href="http://johzzy.github.io/resources/ip_handle/ip_result">ip_result</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/" data-id="ckq28t72g000497vqg0ry8944" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/shell/" rel="tag">shell</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-11-16-批量获取歌曲链接" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" class="article-date">
+  <time datetime="2014-11-16T07:40:59.000Z" itemprop="datePublished">2014-11-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/">批量获取歌曲链接</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>可能是被各种网盘惯坏了，不想一个一个去下载，索性把这些歌曲的网盘链接保存下来，就写了一个批量获取歌曲链接的脚本，在此记录一下。</p>
+<p>基本思路很简单：wget下载网页，grep、awk分析网页，保存结果。</p>
+<p>代码贴一下：</p>
+<pre><code>#!/bin/bash
+#    File Name: getapeurl.sh
+#       Author: johzzy
+#        Email: hellojinqiang@gmail.com
+# Created Time: Sun 16 Nov 2014 03:01:34 PM CST
+
+
+#while read line
+#do
+#    echo $line
+#done &lt; readme.txt
+
+part=&quot;songs_part&quot;
+bak=&quot;songs_bak_part&quot;
+file=&quot;songs.txt&quot;
+musicurl=&quot;musicurl.txt&quot;
+
+declare -i num=0
+
+for url in `cat $musicurl` ; 
+do
+    let num++
+    afile=&quot;$part$num&quot;
+    bfile=&quot;$bak$num&quot;
+    echo $url
+    wget $url -O $afile -o $file 2&gt;&amp;1 /dev/null
+
+    grep href $afile &gt; $bfile
+    grep &quot;http://115.com&quot; $bfile &gt; $afile
+    awk -F &quot;&gt;&quot; &apos;&#123; printf $2 &quot;\n&quot; &#125;&apos; $afile &gt; $bfile
+    awk -F &quot;&lt;&quot; &apos;&#123; printf $1 &quot;\n&quot; &#125;&apos; $bfile &gt; $afile
+done
+
+echo -n &gt; $file
+
+for i in `seq $num` ;
+do 
+    cat &quot;$part$i&quot; &gt;&gt; $file
+    rm &quot;$part$i&quot; &quot;$bak$i&quot;
+done
+[ $? = 0 ] &amp;&amp; echo &quot;ok, all songs url in the file $file.&quot;
+</code></pre><p>其中文件musicurl.txt保存了相关网页</p>
+<pre><code>http://www.cdbao.net/thread-20150-1-1.html
+http://www.cdbao.net/thread-20157-1-1.html
+http://www.cdbao.net/thread-20170-1-1.html
+</code></pre><p>公开一下代码链接吧</p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/getapeurl.sh">getapeurl.sh</a></p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/musicurl.txt">musicurl.txt</a></p>
+<p>生成的链接文件</p>
+<p><a href="http://johzzy.github.io/resources/getapeurl/songs.txt">songs.txt</a></p>
+<p>欢迎下载，如果可以请分享一下你下载的歌曲给我，谢谢！</p>
+<p>(完)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" data-id="ckq28t72c000197vq557zckbj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/shell/" rel="tag">shell</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-11-13-计算两个文件的相对路径" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" class="article-date">
+  <time datetime="2014-11-12T23:20:59.000Z" itemprop="datePublished">2014-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/">计算两个文件的相对路径</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>平台：Ubuntu 14.10</p>
+<p>编译器：gcc 4.9.1</p>
+<p>语言：c++14</p>
+<p>相关特性：lambda，auto</p>
+<p>Github：<a target="_blank" rel="noopener" href="https://github.com/ligelaige/some_cpp_code/blob/master/cpp_lambda/relative_path.cpp">https://github.com/ligelaige/some_cpp_code/blob/master/cpp_lambda/relative_path.cpp</a></p>
+<pre><code>/************************************************************************* 
+&gt; File Name: relative_path.cpp 
+&gt; Author: johzzy 
+&gt; Email: hellojinqiang@gmail.com 
+&gt; Created Time: Thu 13 Nov 2014 01:59:18 AM CST 
+&gt; Compile: g++ relative_path.cpp -std=c++14 
+************************************************************************/  
+#include &lt;iostream&gt;  
+#include &lt;string&gt;  
+#include &lt;vector&gt;  
+#include &lt;sstream&gt;  
+using namespace std;  
+auto split(const string &amp;s, const char delim = &apos; &apos;)  
+&#123;  
+stringstream ss(s);  
+string item;  
+vector&lt;string&gt; elems;  
+while(getline(ss, item, delim) != NULL)  
+&#123;  
+elems.push_back(item);  
+&#125;  
+return elems;  
+&#125;  
+int main(void)  
+&#123;  
+string a, b;  
+cout &lt;&lt; &quot;Please Enter the Absolute Path of the File!&quot; &lt;&lt; endl;  
+cout &lt;&lt; &quot;a = &quot;;  
+cin &gt;&gt; a;  
+cout &lt;&lt; &quot;b = &quot;;  
+cin &gt;&gt; b;  
+auto diffpath = [](const string &amp;a, const string &amp;b) &#123;  
+int k = 0;  
+for (int i=0; i&lt; a.length() &amp;&amp; i&lt;b.length() &amp;&amp; a[i] == b[i]; ++i)  
+if (a[i] == &apos;/&apos;) k=i;  
+return k+1;  
+&#125;;  
+int index = diffpath(a, b);  
+a = a.substr(index);  
+b = b.substr(index);  
+auto vecta = split(a, &apos;/&apos;);  
+auto vectb = split(b, &apos;/&apos;);  
+string a_path_b = &quot;&quot;; //a relative to b path  
+string b_path_a = &quot;&quot;; //b relative to a path  
+for (int i=1; i&lt;vecta.size(); ++i)  
+a_path_b += &quot;../&quot;;  
+a_path_b += a;  
+for(int i=1; i&lt;vectb.size(); ++i)  
+b_path_a += &quot;../&quot;;  
+b_path_a += b;  
+cout &lt;&lt; &quot;a relative to b path: &quot; &lt;&lt; a_path_b &lt;&lt; endl;  
+cout &lt;&lt; &quot;b relative to a path: &quot; &lt;&lt; b_path_a &lt;&lt; endl;  
+return 0;  
+&#125;  
+</code></pre><p>(完)</p>
+<p>PS:</p>
+<p>一个实用的参数：$_</p>
+<p>比如</p>
+<pre><code>$ vi 2014-11-13-计算两个文件的相对路径.md
+# 编辑完成之后，突然想使用gedit看看
+$ gedit $_
+# 这里的 $_ 就是上一个命令的最后一个参数
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" data-id="ckq28t728000097vq9vuo4d22" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/lambda/" rel="tag">lambda</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-2-21-Ubuntu下搭建FTP服务器" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="article-date">
+  <time datetime="2014-02-21T08:24:44.000Z" itemprop="datePublished">2014-02-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">Ubuntu下搭建FTP服务器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <div>由于连接开发板，传输文件的需要，我在ubuntu上安装了ftp服务器</div><br><div>FTP软件选择vsftpd（very secure FTP daemon）<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo apt-get install vsftpd</pre><br><code></code></div><br><div>命令执行过程中，安装程序会给本地创建一个名为“ftp”的用户组，命令执行完之后会自动启动FTP服务。</div><br><div></div><br><div>在浏览器里输入”<a href="ftp://localhost&quot;">ftp://localhost&quot;</a> 检查FTP端口有没有打开</div><br><div></div><br><div>创建一个专门用来访问的用户：ligelaige</div><br><pre class="brush: bash; gutter: true">mkdir -p /home/test<br>useradd test -g ftp -d /home/test -s /sbin/nologin</pre><br>设置密码:<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# mkdir /home/ligelaige<br>root@ubuntu:/home/uwin# useradd ligelaige -g ftp -d /home/ligelaige/ -s /sbin/nologin<br>root@ubuntu:/home/uwin# passwd ligelaige<br>输入新的 UNIX 密码：<br>重新输入新的 UNIX 密码：<br>passwd：已成功更新密码<br>root@ubuntu:/home/uwin#</pre><br><div> 修改vsftpd的配置文件</div><br><div><br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# gedit /etc/vsftpd.conf</pre><br></div><br><div><br><br>需要修改到字段有<br><pre class="brush: bash; gutter: true">#禁止匿名访问<br>anonymous_enable=NO<br>#接受本地用户<br>local_enable=YES<br>#可以上传<br>write_enable=YES<br>#启用在chroot_list_file的用户只能访问根目录<br>chroot_list_enable=YES<br>chroot_list_file=/etc/vsftpd.chroot_list</pre><br>建议修改的方法是<br><br></div><br><div>alt + F 搜索 anonymous_enable=NO（举例）进行修改</div><br><div></div><br><div><br><br>在/etc/vsftpd.chroot_list添加受访问目录限制的用户：<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# echo &quot;ligelaige&quot; &gt;&gt; /etc/vsftpd.chroot_list<br>root@ubuntu:/home/uwin# chmod a-w /home/ligelaige/</pre><br>重启vsftpd之后就可以使用ligelaige账号访问了<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo service vsftpd restart</pre><br></div>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" data-id="ckq28t72h000597vq3xrl19tb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/public/">&amp;laquo; Prev</a><a class="page-number" href="/public/">1</a><span class="page-number current">2</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a><span class="category-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/Python/" rel="tag">Python</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/ffmpeg/" rel="tag">ffmpeg</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/lambda/" rel="tag">lambda</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/shell/" rel="tag">shell</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/public/tags/webrtc/" rel="tag">webrtc</a><span class="tag-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/public/2021/06/18/simulcast-support-in-srs/">simulcast support in srs</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/16/simulcast/">Simulcast</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/01/field-trails/">Field Trails</a>
+          </li>
+        
+          <li>
+            <a href="/public/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
+          </li>
+        
+          <li>
+            <a href="/public/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/">单引号 字符串</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 johzzy<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/public/" class="mobile-nav-link">Home</a>
+  
+    <a href="/public/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/public/fancybox/jquery.fancybox.css">
+
+  
+<script src="/public/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/public/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
