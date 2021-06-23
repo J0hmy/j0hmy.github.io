@@ -62,6 +62,115 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-a-mac-bug-about-udp-port-triggered-by-srs" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2021/06/28/a-mac-bug-about-udp-port-triggered-by-srs/" class="article-date">
+  <time datetime="2021-06-28T09:31:04.000Z" itemprop="datePublished">2021-06-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2021/06/28/a-mac-bug-about-udp-port-triggered-by-srs/">a mac bug about udp port triggered by srs</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在srs上,有一个bug困扰我很长时间了, 最近才分析清楚其原因.</p>
+<h3 id="1-问题概述"><a href="#1-问题概述" class="headerlink" title="1 问题概述"></a>1 问题概述</h3><p>在srs中开启rtc,打开浏览器多次publish 和 play 后, 出现ice协商失败的情况;<br>调试发现udp阻塞所致;<br>更换 rtc 端口可暂时解决问题.</p>
+<h3 id="2-问题分析"><a href="#2-问题分析" class="headerlink" title="2 问题分析"></a>2 问题分析</h3><p>在srs中阻塞函数是来自st的st_recvfrom, 可以从<code>srs/trunk/research/st</code> 入手, 设计如下测试 </p>
+<p>问题组<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: g++ udp-server.cpp ../../objs/st/libst.a -g -O0 -o udp-server &amp;&amp; ./udp-server 127.0.0.1 8000 3</span><br><span class="line">client: g++ udp-client.cpp ../../objs/st/libst.a -g -O0 -o udp-client &amp;&amp; ./udp-client 127.0.0.1 8000 3</span><br></pre></td></tr></table></figure></p>
+<p>对照组<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: g++ udp-server.cpp ../../objs/st/libst.a -g -O0 -o udp-server &amp;&amp; ./udp-server 127.0.0.1 18000 3</span><br><span class="line">client: g++ udp-client.cpp ../../objs/st/libst.a -g -O0 -o udp-client &amp;&amp; ./udp-client 127.0.0.1 18000 3</span><br></pre></td></tr></table></figure></p>
+<p>测试发现问题组server会卡住, 与srs情况一致</p>
+<h3 id="3-更换server的监听ip"><a href="#3-更换server的监听ip" class="headerlink" title="3 更换server的监听ip"></a>3 更换server的监听ip</h3><p>将 server 端 ip 换成 <code>0.0.0.0</code>(即 <code>udp-server 0.0.0.0 8000 3</code> 和 <code>udp-server 0.0.0.0 3</code>)</p>
+<p>测试结果没有变化;</p>
+<p>初步结论是: bug 与 st 有关</p>
+<h3 id="4-调整client"><a href="#4-调整client" class="headerlink" title="4 调整client"></a>4 调整client</h3><p>将 client换成 nc, 具体如下</p>
+<p>问题组<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: g++ udp-server.cpp ../../objs/st/libst.a -g -O0 -o udp-server &amp;&amp; ./udp-server 127.0.0.1 8000 3</span><br><span class="line">client: echo &quot;Hello&quot; | nc -4u $CANDIDATE 8000</span><br></pre></td></tr></table></figure><br>对照组<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: g++ udp-server.cpp ../../objs/st/libst.a -g -O0 -o udp-server &amp;&amp; ./udp-server 127.0.0.1 18000 3</span><br><span class="line">client: echo &quot;Hello&quot; | nc -4u $CANDIDATE 18000</span><br></pre></td></tr></table></figure></p>
+<p>测试结果与之前一致.</p>
+<h3 id="5-调整server"><a href="#5-调整server" class="headerlink" title="5 调整server"></a>5 调整server</h3><p>再进一步调整测试</p>
+<p>问题组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: nc -u -l 8000</span><br><span class="line">client: echo &quot;Hello&quot; | nc -4u $CANDIDATE 8000</span><br></pre></td></tr></table></figure>
+<p>对照组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: nc -u -l 8000</span><br><span class="line">client: echo &quot;Hello&quot; | nc -4u $CANDIDATE 18000</span><br></pre></td></tr></table></figure>
+<p>测试结果与之前依然一致. 不过,可以排除st的嫌疑了;</p>
+<p>结论是: bug与st无关</p>
+<p>那么,只能是与mac有关了</p>
+<h3 id="6-结论"><a href="#6-结论" class="headerlink" title="6 结论"></a>6 结论</h3><p>综合上述各次测试对比, 这个bug与st无关,与操作系统mac有关. </p>
+<p>能力有限, 这个问题就不再往下分析了,就此记录一下.</p>
+<p>我的系统是<code>macOS Big Sur 11.4</code>, 通过<code>uname -a</code>查看, 具体为 <code>Darwin Kernel Version 20.5.0: Sat May  8 05:10:33 PDT 2021; root:xnu-7195.121.3~9/RELEASE_X86_64 x86_64</code></p>
+<p>不过在升级系统前(macOS 10.15)也同样存在这个问题.</p>
+<p>PS: </p>
+<ol>
+<li>CANDIDATE=$(ifconfig en0 inet| grep inet|awk ‘{print $2}’)</li>
+<li>查看端口占用 lsof -i:8000</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2021/06/28/a-mac-bug-about-udp-port-triggered-by-srs/" data-id="ckqhkhszr0019uavq1ut412su" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-simulcast-layer-state-control" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2021/06/23/simulcast-layer-state-control/" class="article-date">
+  <time datetime="2021-06-23T09:08:04.000Z" itemprop="datePublished">2021-06-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2021/06/23/simulcast-layer-state-control/">simulcast layer state control</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>simulcast 层级状态控制</p>
+<p>webrtc通过 StreamContext 表示simulcast的层级概念</p>
+<p>如果需要暂停simulcast某层的工作,设置 layer_context.set_is_paused(true)即可,webrtc代码引用如下<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">for (StreamContext&amp; layer_context : stream_contexts_) &#123;</span><br><span class="line">  int stream_idx = layer_context.stream_idx();</span><br><span class="line">  uint32_t stream_bitrate_kbps =</span><br><span class="line">      parameters.bitrate.GetSpatialLayerSum(stream_idx) / 1000;</span><br><span class="line"></span><br><span class="line">  // Need a key frame if we have not sent this stream before.</span><br><span class="line">  if (stream_bitrate_kbps &gt; 0 &amp;&amp; layer_context.is_paused()) &#123;</span><br><span class="line">    layer_context.set_is_keyframe_needed();</span><br><span class="line">  &#125;</span><br><span class="line">  layer_context.set_is_paused(stream_bitrate_kbps == 0);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>设置后,webrtc会在以下逻辑中使用它<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for (auto&amp; layer : stream_contexts_) &#123;</span><br><span class="line">  // Don&#x27;t encode frames in resolutions that we don&#x27;t intend to send.</span><br><span class="line">  if (layer.is_paused()) &#123;</span><br><span class="line">    continue;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有上述代码可知, parameters.bitrate.GetSpatialLayerSum(stream_idx) 控制着 layer_context 的状态 state(actived/paused), 进而通过控制 layer_context 控制编码器工作 </p>
+<p>那么从哪里修改 parameters.bitrate 呢? 外部接口如何操作它呢?</p>
+<p>(待续未完 …)</p>
+<p>MediaStreamTrack.SetEnabled<br>JNI_MediaStreamTrack_SetEnabled<br>MediaStreamTrackInterface<br>VideoTrackInterface<br>VideoTrack<br>VideoTrackSource::AddOrUpdateSink(video_source_-&gt;AddOrUpdateSink)<br>AdaptedVideoTrackSource::AddOrUpdateSink<br>VideoBroadcaster::AddOrUpdateSink<br>VideoSourceBase::AddOrUpdateSink, UpdateWants</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2021/06/23/simulcast-layer-state-control/" data-id="ckqhkhszv001kuavqf00xdmtl" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-simulcast-support-in-srs" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/public/2021/06/18/simulcast-support-in-srs/" class="article-date">
@@ -101,7 +210,7 @@ other2: webrtc://127.0.0.1/live/livestream?layer=1,2&amp;foo=bar
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2021/06/18/simulcast-support-in-srs/" data-id="ckq28t730001c97vqepx96boo" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2021/06/18/simulcast-support-in-srs/" data-id="ckqhkhszt001euavq1kolbffz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/webrtc/" rel="tag">webrtc</a></li></ul>
@@ -156,7 +265,7 @@ other2: webrtc://127.0.0.1/live/livestream?layer=1,2&amp;foo=bar
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2021/06/16/simulcast/" data-id="ckq28t731001e97vq8s4i6uiz" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2021/06/16/simulcast/" data-id="ckqhkhszv001iuavqhaqleb7d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/webrtc/" rel="tag">webrtc</a></li></ul>
@@ -276,7 +385,7 @@ https://github.com/johzzy/webrtc-mirror/blob/master/system_wrappers/source/field
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2021/06/01/field-trails/" data-id="ckq28t72y001997vq3zgn0czf" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2021/06/01/field-trails/" data-id="ckqhkhszs001cuavq2mcz54tr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/webrtc/" rel="tag">webrtc</a></li></ul>
@@ -315,7 +424,7 @@ https://github.com/johzzy/webrtc-mirror/blob/master/system_wrappers/source/field
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2018/05/13/2018-05-13-ffmpeg-scale-samples/" data-id="ckq28t72x001697vq3cpy0bs2" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2018/05/13/2018-05-13-ffmpeg-scale-samples/" data-id="ckqhkhszq0016uavq0xwn0l99" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/ffmpeg/" rel="tag">ffmpeg</a></li></ul>
@@ -415,7 +524,7 @@ int main()
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/" data-id="ckq28t72s000u97vq2b6wdh7f" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/" data-id="ckqhkhszm000uuavq8cff0ebq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -502,7 +611,7 @@ yum install dos2unix lrzsz
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/07/28/2016-07-28-centos_upgrade_python/" data-id="ckq28t72r000r97vqgpfqall4" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2016/07/28/2016-07-28-centos_upgrade_python/" data-id="ckqhkhszl000ruavq4pmn2pzl" class="article-share-link">Share</a>
       
       
     </footer>
@@ -571,7 +680,7 @@ make install
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/07/28/2016-07-28-centos_upgrade_gcc/" data-id="ckq28t72q000o97vqgwmxatid" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2016/07/28/2016-07-28-centos_upgrade_gcc/" data-id="ckqhkhszj000ouavq4onda0ii" class="article-share-link">Share</a>
       
       
     </footer>
@@ -746,158 +855,7 @@ zsh-history-substring-search
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/06/06/2016-6-6-browser-plugin/" data-id="ckq28t72w001397vqdxin18jf" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-2016-4-13-my-string-format" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/public/2016/04/13/2016-4-13-my-string-format/" class="article-date">
-  <time datetime="2016-04-13T09:57:35.000Z" itemprop="datePublished">2016-04-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/public/2016/04/13/2016-4-13-my-string-format/">一种字符串序列描述</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>将两个序列</p>
-<pre><code>A = &#123;1, 4, 6, 8, 9&#125;
-B = &#123;10, 11, 12, ...20&#125;
-</code></pre><p>转为如下形式</p>
-<pre><code>string a = &quot;1,4,6,8-9&quot;;
-string b = &quot;10-20&quot;; 
-</code></pre><p>实现如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">QString SeriesEdit::FormatSeries(const QSet&lt;int&gt;&amp; series)</span><br><span class="line">&#123;	</span><br><span class="line">	QList&lt;int&gt; series_list = series.toList();</span><br><span class="line">	qSort(series_list.begin(), series_list.end());</span><br><span class="line"></span><br><span class="line">	int last = 0xffffffff;</span><br><span class="line">	bool match = false;</span><br><span class="line"></span><br><span class="line">	QString series_str;</span><br><span class="line">	for (QList&lt;int&gt;::iterator it = series_list.begin(); it != series_list.end(); ++it)</span><br><span class="line">	&#123;</span><br><span class="line">		int var = *it;</span><br><span class="line">		if (it == series_list.begin())</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += QString::number(var);</span><br><span class="line">		&#125;</span><br><span class="line">		else if (last + 1 == var)</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += &quot;-&quot;;</span><br><span class="line">			match = true;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (match)</span><br><span class="line">		&#123;			</span><br><span class="line">			series_str += QString::number(last) + &quot;,&quot; + QString::number(var);</span><br><span class="line">			match = false;</span><br><span class="line">		&#125;	</span><br><span class="line">		else</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += &quot;,&quot; + QString::number(var);</span><br><span class="line">		&#125;</span><br><span class="line">		last = *it;</span><br><span class="line">	&#125;</span><br><span class="line">	if (match)</span><br><span class="line">	&#123;</span><br><span class="line">		series_str += QString::number(last);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return series_str.split(&quot;-&quot;, QString::SkipEmptyParts).join(&quot;-&quot;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/04/13/2016-4-13-my-string-format/" data-id="ckq28t72v001097vq79bhbkm5" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-2016-1-18-C++中set和get的简单方式" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/public/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/" class="article-date">
-  <time datetime="2016-01-18T02:46:05.000Z" itemprop="datePublished">2016-01-18</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/public/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/">C++中set和get的简单方式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下</p>
-<pre><code>`
-#define SUCCESS 1 // #define SUCCESS 1
-#define FAIL 0 // #define FAIL 0
-#include &lt;iostream&gt;
-int add(int a, int b) &#123; return a + b; &#125;
-class A
-&#123;
-private:
-    int a_;
-    int b_;
-public:
-    const int&amp; a;
-    const int&amp; b;
-public:
-    int x_;
-    int y_;
-    const int&amp; x;
-    const int&amp; y;
-    A()
-    : a_(0), b_(0), x_(0), y_(0)
-    , a(a_), b(b_), x(x_), y(y_)
-    &#123;&#125;
-
-    void print() &#123; 
-        std::cout &lt;&lt; &quot;  a=&quot; &lt;&lt; a &lt;&lt; &quot;, a_=&quot; &lt;&lt; a_ 
-              &lt;&lt; &quot;, b=&quot; &lt;&lt; b &lt;&lt; &quot;, b_=&quot; &lt;&lt; b_
-              &lt;&lt; &quot;, x=&quot; &lt;&lt; x &lt;&lt; &quot;, x_=&quot; &lt;&lt; x_
-              &lt;&lt; &quot;, y=&quot; &lt;&lt; y &lt;&lt; &quot;, y_=&quot; &lt;&lt; y_
-                          &lt;&lt; &quot;.\n&quot;;
-    &#125;
-&#125;;
-
-int  main()
-&#123;
-    int result = add(SUCCESS, FAIL);
-    A a;
-    a.x_ = 4;    // (1) 
-    //a.x = 5;    // (2) 
-    //a.a_ = 3; // (3)
-    //a.a = 5;  // (4)
-    a.y_ = a.x; // (5)
-    // a.y = a.x; // (6)
-    // a.a = a.y; // (7)    
-    a.print();
-    return 0;
-&#125;
-`
-</code></pre><p>其中,</p>
-<p>(1) <code>public int x_</code>, 跟全局变量的访问一样<br>(2) <code>a.x</code> 为 <code>public int&amp;</code> 类型, 指向<code>public int x_</code>, 这里相当于 <code>set</code><br>(3) error, <code>private int a_</code> 尝试修改私有变量的值<br>(4) error, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(5) <code>a.x</code> 相当于<code>get</code>, 并修改 <code>y_</code><br>(6) <code>error</code>, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(7) <code>error</code>, <code>a.x</code> 相当于<code>get</code>, <code>a.a</code> 尝试修改<code>const</code>变量  </p>
-<p>对此，如果一个变量 <code>var</code> 是只读的，但是在对象构造时需要赋值, 可以参照如下方式</p>
-<pre><code>class A 
-&#123;
-private:
-    int var_;
-public:
-    const int&amp; var;
-public:
-    A(int a):var_(a)&#123;&#125;
-    Foo() &#123; /*process var_*/ &#125;
-&#125;;
-</code></pre><p>于是, 在初始化是可以 <code>A a(5)</code>, 在<code>a</code>的内部, 仍然可以对 <code>var_</code> 做任何处理, 使用时 <code>a.var</code>, 而不必考虑<code>var</code>被外界修改的问题.</p>
-<p>(完)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/" data-id="ckq28t72u000x97vq6jso572l" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2016/06/06/2016-6-6-browser-plugin/" data-id="ckqhkhszp0013uavqbepa59l2" class="article-share-link">Share</a>
       
       
     </footer>
@@ -911,7 +869,7 @@ public:
 
   <nav id="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/public/page/2/">2</a><a class="extend next" rel="next" href="/public/page/2/">Next &amp;raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/public/page/2/">2</a><a class="page-number" href="/public/page/3/">3</a><a class="extend next" rel="next" href="/public/page/2/">Next &amp;raquo;</a>
   </nav>
 
 </section>
@@ -942,7 +900,7 @@ public:
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -955,6 +913,14 @@ public:
       <ul>
         
           <li>
+            <a href="/public/2021/06/28/a-mac-bug-about-udp-port-triggered-by-srs/">a mac bug about udp port triggered by srs</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/23/simulcast-layer-state-control/">simulcast layer state control</a>
+          </li>
+        
+          <li>
             <a href="/public/2021/06/18/simulcast-support-in-srs/">simulcast support in srs</a>
           </li>
         
@@ -964,14 +930,6 @@ public:
         
           <li>
             <a href="/public/2021/06/01/field-trails/">Field Trails</a>
-          </li>
-        
-          <li>
-            <a href="/public/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
-          </li>
-        
-          <li>
-            <a href="/public/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/">单引号 字符串</a>
           </li>
         
       </ul>

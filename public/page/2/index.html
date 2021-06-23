@@ -62,6 +62,157 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-2016-4-13-my-string-format" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2016/04/13/2016-4-13-my-string-format/" class="article-date">
+  <time datetime="2016-04-13T09:57:35.000Z" itemprop="datePublished">2016-04-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2016/04/13/2016-4-13-my-string-format/">一种字符串序列描述</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>将两个序列</p>
+<pre><code>A = &#123;1, 4, 6, 8, 9&#125;
+B = &#123;10, 11, 12, ...20&#125;
+</code></pre><p>转为如下形式</p>
+<pre><code>string a = &quot;1,4,6,8-9&quot;;
+string b = &quot;10-20&quot;; 
+</code></pre><p>实现如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">QString SeriesEdit::FormatSeries(const QSet&lt;int&gt;&amp; series)</span><br><span class="line">&#123;	</span><br><span class="line">	QList&lt;int&gt; series_list = series.toList();</span><br><span class="line">	qSort(series_list.begin(), series_list.end());</span><br><span class="line"></span><br><span class="line">	int last = 0xffffffff;</span><br><span class="line">	bool match = false;</span><br><span class="line"></span><br><span class="line">	QString series_str;</span><br><span class="line">	for (QList&lt;int&gt;::iterator it = series_list.begin(); it != series_list.end(); ++it)</span><br><span class="line">	&#123;</span><br><span class="line">		int var = *it;</span><br><span class="line">		if (it == series_list.begin())</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += QString::number(var);</span><br><span class="line">		&#125;</span><br><span class="line">		else if (last + 1 == var)</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += &quot;-&quot;;</span><br><span class="line">			match = true;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (match)</span><br><span class="line">		&#123;			</span><br><span class="line">			series_str += QString::number(last) + &quot;,&quot; + QString::number(var);</span><br><span class="line">			match = false;</span><br><span class="line">		&#125;	</span><br><span class="line">		else</span><br><span class="line">		&#123;</span><br><span class="line">			series_str += &quot;,&quot; + QString::number(var);</span><br><span class="line">		&#125;</span><br><span class="line">		last = *it;</span><br><span class="line">	&#125;</span><br><span class="line">	if (match)</span><br><span class="line">	&#123;</span><br><span class="line">		series_str += QString::number(last);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return series_str.split(&quot;-&quot;, QString::SkipEmptyParts).join(&quot;-&quot;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2016/04/13/2016-4-13-my-string-format/" data-id="ckqhkhszo0010uavq669l6z67" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2016-1-18-C++中set和get的简单方式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/public/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/" class="article-date">
+  <time datetime="2016-01-18T02:46:05.000Z" itemprop="datePublished">2016-01-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/public/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/">C++中set和get的简单方式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在C#中, 有比较通用的set和get, 在C++中可以使用引用和访问限制符来简单处理,   具体如下</p>
+<pre><code>`
+#define SUCCESS 1 // #define SUCCESS 1
+#define FAIL 0 // #define FAIL 0
+#include &lt;iostream&gt;
+int add(int a, int b) &#123; return a + b; &#125;
+class A
+&#123;
+private:
+    int a_;
+    int b_;
+public:
+    const int&amp; a;
+    const int&amp; b;
+public:
+    int x_;
+    int y_;
+    const int&amp; x;
+    const int&amp; y;
+    A()
+    : a_(0), b_(0), x_(0), y_(0)
+    , a(a_), b(b_), x(x_), y(y_)
+    &#123;&#125;
+
+    void print() &#123; 
+        std::cout &lt;&lt; &quot;  a=&quot; &lt;&lt; a &lt;&lt; &quot;, a_=&quot; &lt;&lt; a_ 
+              &lt;&lt; &quot;, b=&quot; &lt;&lt; b &lt;&lt; &quot;, b_=&quot; &lt;&lt; b_
+              &lt;&lt; &quot;, x=&quot; &lt;&lt; x &lt;&lt; &quot;, x_=&quot; &lt;&lt; x_
+              &lt;&lt; &quot;, y=&quot; &lt;&lt; y &lt;&lt; &quot;, y_=&quot; &lt;&lt; y_
+                          &lt;&lt; &quot;.\n&quot;;
+    &#125;
+&#125;;
+
+int  main()
+&#123;
+    int result = add(SUCCESS, FAIL);
+    A a;
+    a.x_ = 4;    // (1) 
+    //a.x = 5;    // (2) 
+    //a.a_ = 3; // (3)
+    //a.a = 5;  // (4)
+    a.y_ = a.x; // (5)
+    // a.y = a.x; // (6)
+    // a.a = a.y; // (7)    
+    a.print();
+    return 0;
+&#125;
+`
+</code></pre><p>其中,</p>
+<p>(1) <code>public int x_</code>, 跟全局变量的访问一样<br>(2) <code>a.x</code> 为 <code>public int&amp;</code> 类型, 指向<code>public int x_</code>, 这里相当于 <code>set</code><br>(3) error, <code>private int a_</code> 尝试修改私有变量的值<br>(4) error, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(5) <code>a.x</code> 相当于<code>get</code>, 并修改 <code>y_</code><br>(6) <code>error</code>, <code>public const int&amp; y</code> 尝试修改<code>const</code>变量<br>(7) <code>error</code>, <code>a.x</code> 相当于<code>get</code>, <code>a.a</code> 尝试修改<code>const</code>变量  </p>
+<p>对此，如果一个变量 <code>var</code> 是只读的，但是在对象构造时需要赋值, 可以参照如下方式</p>
+<pre><code>class A 
+&#123;
+private:
+    int var_;
+public:
+    const int&amp; var;
+public:
+    A(int a):var_(a)&#123;&#125;
+    Foo() &#123; /*process var_*/ &#125;
+&#125;;
+</code></pre><p>于是, 在初始化是可以 <code>A a(5)</code>, 在<code>a</code>的内部, 仍然可以对 <code>var_</code> 做任何处理, 使用时 <code>a.var</code>, 而不必考虑<code>var</code>被外界修改的问题.</p>
+<p>(完)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johzzy.github.io/2016/01/18/2016-1-18-C++%E4%B8%ADset%E5%92%8Cget%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E5%BC%8F/" data-id="ckqhkhszn000xuavqd04i6tkk" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-2015-11-20-C++内存对齐" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/public/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" class="article-date">
@@ -156,7 +307,7 @@ a.i:   8453700
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" data-id="ckq28t72p000l97vq0tbr332e" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/11/20/2015-11-20-C++%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" data-id="ckqhkhszi000luavq8nm90t9k" class="article-share-link">Share</a>
       
       
     </footer>
@@ -246,7 +397,7 @@ msr_free(&amp;msr);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/11/15/2015-11-15-miniseed-note/" data-id="ckq28t72n000i97vq3je4h7oy" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/11/15/2015-11-15-miniseed-note/" data-id="ckqhkhszf000iuavqdz8laa2e" class="article-share-link">Share</a>
       
       
     </footer>
@@ -355,7 +506,7 @@ int main(void)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/01/22/2015-1-26-%E8%AE%A1%E7%AE%97A%E6%96%87%E4%BB%B6%E7%9B%B8%E5%AF%B9B%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84/" data-id="ckq28t72m000f97vq7z471bg8" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/01/22/2015-1-26-%E8%AE%A1%E7%AE%97A%E6%96%87%E4%BB%B6%E7%9B%B8%E5%AF%B9B%E6%96%87%E4%BB%B6%E7%9A%84%E8%B7%AF%E5%BE%84/" data-id="ckqhkhsza000auavq27eggk5s" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/C/" rel="tag">C++</a></li></ul>
@@ -481,7 +632,7 @@ if __name__ == &quot;__main__&quot;:
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/01/20/2015-1-20-python-tree/" data-id="ckq28t72k000b97vq3bi3ali7" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/01/20/2015-1-20-python-tree/" data-id="ckqhkhsz70006uavq32b2cffz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
@@ -562,7 +713,7 @@ if __name__ == &apos;__main__&apos;:
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6/" data-id="ckq28t72k000a97vq1x6he3ln" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6/" data-id="ckqhkhsz60005uavqfyzy7eqc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
@@ -653,7 +804,7 @@ if __name__ == &quot;__main__&quot;:
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-ssh%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6/" data-id="ckq28t72i000697vq5xlo8u3i" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2015/01/14/2015-1-14-python-ssh%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6/" data-id="ckqhkhszb000buavqb9zach7c" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/Python/" rel="tag">Python</a></li></ul>
@@ -729,7 +880,7 @@ if __name__ == &quot;__main__&quot;:
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/" data-id="ckq28t72g000497vqg0ry8944" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2014/11/17/2014-11-17-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86-%E5%B0%8F%E7%AC%94%E8%AE%B0/" data-id="ckqhkhsz10001uavqeqop3f83" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/shell/" rel="tag">shell</a></li></ul>
@@ -826,161 +977,10 @@ http://www.cdbao.net/thread-20170-1-1.html
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" data-id="ckq28t72c000197vq557zckbj" class="article-share-link">Share</a>
+      <a data-url="https://johzzy.github.io/2014/11/16/2014-11-16-%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%AD%8C%E6%9B%B2%E9%93%BE%E6%8E%A5/" data-id="ckqhkhsz50004uavq9zu16hff" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/shell/" rel="tag">shell</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-2014-11-13-计算两个文件的相对路径" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/public/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" class="article-date">
-  <time datetime="2014-11-12T23:20:59.000Z" itemprop="datePublished">2014-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/public/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/">计算两个文件的相对路径</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>平台：Ubuntu 14.10</p>
-<p>编译器：gcc 4.9.1</p>
-<p>语言：c++14</p>
-<p>相关特性：lambda，auto</p>
-<p>Github：<a target="_blank" rel="noopener" href="https://github.com/ligelaige/some_cpp_code/blob/master/cpp_lambda/relative_path.cpp">https://github.com/ligelaige/some_cpp_code/blob/master/cpp_lambda/relative_path.cpp</a></p>
-<pre><code>/************************************************************************* 
-&gt; File Name: relative_path.cpp 
-&gt; Author: johzzy 
-&gt; Email: hellojinqiang@gmail.com 
-&gt; Created Time: Thu 13 Nov 2014 01:59:18 AM CST 
-&gt; Compile: g++ relative_path.cpp -std=c++14 
-************************************************************************/  
-#include &lt;iostream&gt;  
-#include &lt;string&gt;  
-#include &lt;vector&gt;  
-#include &lt;sstream&gt;  
-using namespace std;  
-auto split(const string &amp;s, const char delim = &apos; &apos;)  
-&#123;  
-stringstream ss(s);  
-string item;  
-vector&lt;string&gt; elems;  
-while(getline(ss, item, delim) != NULL)  
-&#123;  
-elems.push_back(item);  
-&#125;  
-return elems;  
-&#125;  
-int main(void)  
-&#123;  
-string a, b;  
-cout &lt;&lt; &quot;Please Enter the Absolute Path of the File!&quot; &lt;&lt; endl;  
-cout &lt;&lt; &quot;a = &quot;;  
-cin &gt;&gt; a;  
-cout &lt;&lt; &quot;b = &quot;;  
-cin &gt;&gt; b;  
-auto diffpath = [](const string &amp;a, const string &amp;b) &#123;  
-int k = 0;  
-for (int i=0; i&lt; a.length() &amp;&amp; i&lt;b.length() &amp;&amp; a[i] == b[i]; ++i)  
-if (a[i] == &apos;/&apos;) k=i;  
-return k+1;  
-&#125;;  
-int index = diffpath(a, b);  
-a = a.substr(index);  
-b = b.substr(index);  
-auto vecta = split(a, &apos;/&apos;);  
-auto vectb = split(b, &apos;/&apos;);  
-string a_path_b = &quot;&quot;; //a relative to b path  
-string b_path_a = &quot;&quot;; //b relative to a path  
-for (int i=1; i&lt;vecta.size(); ++i)  
-a_path_b += &quot;../&quot;;  
-a_path_b += a;  
-for(int i=1; i&lt;vectb.size(); ++i)  
-b_path_a += &quot;../&quot;;  
-b_path_a += b;  
-cout &lt;&lt; &quot;a relative to b path: &quot; &lt;&lt; a_path_b &lt;&lt; endl;  
-cout &lt;&lt; &quot;b relative to a path: &quot; &lt;&lt; b_path_a &lt;&lt; endl;  
-return 0;  
-&#125;  
-</code></pre><p>(完)</p>
-<p>PS:</p>
-<p>一个实用的参数：$_</p>
-<p>比如</p>
-<pre><code>$ vi 2014-11-13-计算两个文件的相对路径.md
-# 编辑完成之后，突然想使用gedit看看
-$ gedit $_
-# 这里的 $_ 就是上一个命令的最后一个参数
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2014/11/13/2014-11-13-%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" data-id="ckq28t728000097vq9vuo4d22" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/lambda/" rel="tag">lambda</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-2014-2-21-Ubuntu下搭建FTP服务器" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/public/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="article-date">
-  <time datetime="2014-02-21T08:24:44.000Z" itemprop="datePublished">2014-02-21</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/public/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/public/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">Ubuntu下搭建FTP服务器</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <div>由于连接开发板，传输文件的需要，我在ubuntu上安装了ftp服务器</div><br><div>FTP软件选择vsftpd（very secure FTP daemon）<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo apt-get install vsftpd</pre><br><code></code></div><br><div>命令执行过程中，安装程序会给本地创建一个名为“ftp”的用户组，命令执行完之后会自动启动FTP服务。</div><br><div></div><br><div>在浏览器里输入”<a href="ftp://localhost&quot;">ftp://localhost&quot;</a> 检查FTP端口有没有打开</div><br><div></div><br><div>创建一个专门用来访问的用户：ligelaige</div><br><pre class="brush: bash; gutter: true">mkdir -p /home/test<br>useradd test -g ftp -d /home/test -s /sbin/nologin</pre><br>设置密码:<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# mkdir /home/ligelaige<br>root@ubuntu:/home/uwin# useradd ligelaige -g ftp -d /home/ligelaige/ -s /sbin/nologin<br>root@ubuntu:/home/uwin# passwd ligelaige<br>输入新的 UNIX 密码：<br>重新输入新的 UNIX 密码：<br>passwd：已成功更新密码<br>root@ubuntu:/home/uwin#</pre><br><div> 修改vsftpd的配置文件</div><br><div><br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# gedit /etc/vsftpd.conf</pre><br></div><br><div><br><br>需要修改到字段有<br><pre class="brush: bash; gutter: true">#禁止匿名访问<br>anonymous_enable=NO<br>#接受本地用户<br>local_enable=YES<br>#可以上传<br>write_enable=YES<br>#启用在chroot_list_file的用户只能访问根目录<br>chroot_list_enable=YES<br>chroot_list_file=/etc/vsftpd.chroot_list</pre><br>建议修改的方法是<br><br></div><br><div>alt + F 搜索 anonymous_enable=NO（举例）进行修改</div><br><div></div><br><div><br><br>在/etc/vsftpd.chroot_list添加受访问目录限制的用户：<br><pre class="brush: bash; gutter: true">root@ubuntu:/home/uwin# echo &quot;ligelaige&quot; &gt;&gt; /etc/vsftpd.chroot_list<br>root@ubuntu:/home/uwin# chmod a-w /home/ligelaige/</pre><br>重启vsftpd之后就可以使用ligelaige账号访问了<br><pre class="brush: bash; gutter: true">uwin@ubuntu:~$ sudo service vsftpd restart</pre><br></div>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://johzzy.github.io/2014/02/21/2014-2-21-Ubuntu%E4%B8%8B%E6%90%AD%E5%BB%BAFTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" data-id="ckq28t72h000597vq3xrl19tb" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/public/tags/FTP/" rel="tag">FTP</a></li></ul>
 
     </footer>
   </div>
@@ -993,7 +993,7 @@ $ gedit $_
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/public/">&amp;laquo; Prev</a><a class="page-number" href="/public/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" href="/public/">&amp;laquo; Prev</a><a class="page-number" href="/public/">1</a><span class="page-number current">2</span><a class="page-number" href="/public/page/3/">3</a><a class="extend next" rel="next" href="/public/page/3/">Next &amp;raquo;</a>
   </nav>
 
 </section>
@@ -1024,7 +1024,7 @@ $ gedit $_
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2021/06/">June 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/08/">August 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/07/">July 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/06/">June 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/11/">November 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2015/01/">January 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/11/">November 2014</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/public/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1037,6 +1037,14 @@ $ gedit $_
       <ul>
         
           <li>
+            <a href="/public/2021/06/28/a-mac-bug-about-udp-port-triggered-by-srs/">a mac bug about udp port triggered by srs</a>
+          </li>
+        
+          <li>
+            <a href="/public/2021/06/23/simulcast-layer-state-control/">simulcast layer state control</a>
+          </li>
+        
+          <li>
             <a href="/public/2021/06/18/simulcast-support-in-srs/">simulcast support in srs</a>
           </li>
         
@@ -1046,14 +1054,6 @@ $ gedit $_
         
           <li>
             <a href="/public/2021/06/01/field-trails/">Field Trails</a>
-          </li>
-        
-          <li>
-            <a href="/public/2018/05/13/2018-05-13-ffmpeg-scale-samples/">ffmpeg scale samples</a>
-          </li>
-        
-          <li>
-            <a href="/public/2016/08/29/2016-08-29-%E5%8D%95%E5%BC%95%E5%8F%B7-%E5%AD%97%E7%AC%A6%E4%B8%B2/">单引号 字符串</a>
           </li>
         
       </ul>
